@@ -1,15 +1,15 @@
-# 2023-08-13 08:13:59 by RouterOS 7.11rc3
-# software id = MJCV-4CR1
+# 2023-08-13 08:14:00 by RouterOS 7.11rc3
+# software id = IPEJ-SFQM
 #
 # model = C53UiG+5HPaxD2HPaxD
 /interface bridge
 add name=bridge vlan-filtering=yes
 /interface ethernet
 set [ find default-name=ether1 ] name=ether1_ALL
-set [ find default-name=ether2 ] name=ether2_HOME
-set [ find default-name=ether3 ] name=ether3_HOME
+set [ find default-name=ether2 ] name=ether2_ALL
+set [ find default-name=ether3 ] name=ether3_OFFICE
 set [ find default-name=ether4 ] name=ether4_IOT
-set [ find default-name=ether5 ] disabled=yes
+set [ find default-name=ether5 ] name=ether5_MGMT
 /interface vlan
 add interface=bridge name=MGMT vlan-id=1000
 /interface list
@@ -18,29 +18,30 @@ add name=Management
 add bridge=bridge disabled=no name=capdp
 /interface wifiwave2
 # managed by CAPsMAN
-# mode: AP, SSID: Tech Intensity Home, channel: 5540/ax/eeCe
+# mode: AP, SSID: Tech Intensity Home, channel: 5680/ax/eCee
 set [ find default-name=wifi1 ] configuration.manager=capsman .mode=ap \
     datapath=capdp disabled=no
 # managed by CAPsMAN
-# mode: AP, SSID: Tech Intensity Home, channel: 2422/ax/Ce
+# mode: AP, SSID: Tech Intensity Home, channel: 2442/ax/eC
 set [ find default-name=wifi2 ] configuration.manager=capsman .mode=ap \
     datapath=capdp disabled=no
 /interface bridge port
 add bridge=bridge frame-types=admit-only-vlan-tagged interface=ether1_ALL
+add bridge=bridge frame-types=admit-only-vlan-tagged interface=ether2_ALL
 add bridge=bridge frame-types=admit-only-untagged-and-priority-tagged \
-    interface=ether2_HOME pvid=1020
-add bridge=bridge frame-types=admit-only-untagged-and-priority-tagged \
-    interface=ether3_HOME pvid=1020
+    interface=ether3_OFFICE pvid=1010
 add bridge=bridge frame-types=admit-only-untagged-and-priority-tagged \
     interface=ether4_IOT pvid=1030
+add bridge=bridge frame-types=admit-only-untagged-and-priority-tagged \
+    interface=ether5_MGMT pvid=1000
 /ip neighbor discovery-settings
 set discover-interface-list=!dynamic
 /interface bridge vlan
-add bridge=bridge tagged=ether1_ALL,bridge vlan-ids=1000
-add bridge=bridge tagged=ether1_ALL,bridge vlan-ids=1010
-add bridge=bridge tagged=ether1_ALL,bridge vlan-ids=1020
-add bridge=bridge tagged=ether1_ALL,bridge vlan-ids=1030
-add bridge=bridge tagged=ether1_ALL,bridge vlan-ids=1040
+add bridge=bridge tagged=ether1_ALL,ether2_ALL,bridge vlan-ids=1000
+add bridge=bridge tagged=ether1_ALL,ether2_ALL,bridge vlan-ids=1010
+add bridge=bridge tagged=ether1_ALL,ether2_ALL,bridge vlan-ids=1020
+add bridge=bridge tagged=ether1_ALL,ether2_ALL,bridge vlan-ids=1030
+add bridge=bridge tagged=ether1_ALL,ether2_ALL,bridge vlan-ids=1040
 /interface list member
 add interface=MGMT list=Management
 /interface wifiwave2 cap
@@ -63,7 +64,7 @@ set strong-crypto=yes
 /system clock
 set time-zone-name=Europe/Amsterdam
 /system identity
-set name=hap01
+set name=hap02
 /system note
 set show-at-login=no
 /system ntp client
