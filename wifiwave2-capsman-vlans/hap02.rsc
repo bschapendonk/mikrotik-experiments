@@ -1,9 +1,9 @@
-# 2023-08-13 08:14:00 by RouterOS 7.11rc3
+# 2023-08-27 17:40:56 by RouterOS 7.11
 # software id = IPEJ-SFQM
 #
 # model = C53UiG+5HPaxD2HPaxD
 /interface bridge
-add name=bridge vlan-filtering=yes
+add auto-mac=no name=bridge vlan-filtering=yes
 /interface ethernet
 set [ find default-name=ether1 ] name=ether1_ALL
 set [ find default-name=ether2 ] name=ether2_ALL
@@ -18,11 +18,11 @@ add name=Management
 add bridge=bridge disabled=no name=capdp
 /interface wifiwave2
 # managed by CAPsMAN
-# mode: AP, SSID: Tech Intensity Home, channel: 5680/ax/eCee
+# mode: AP, SSID: Home, channel: 5680/ax/eCee
 set [ find default-name=wifi1 ] configuration.manager=capsman .mode=ap \
     datapath=capdp disabled=no
 # managed by CAPsMAN
-# mode: AP, SSID: Tech Intensity Home, channel: 2442/ax/eC
+# mode: AP, SSID: Home, channel: 2422/ax/Ce
 set [ find default-name=wifi2 ] configuration.manager=capsman .mode=ap \
     datapath=capdp disabled=no
 /interface bridge port
@@ -69,10 +69,6 @@ set name=hap02
 set show-at-login=no
 /system ntp client
 set enabled=yes
-/system ntp client servers
-add address=10.185.0.1
-/system package update
-set channel=testing
 /system scheduler
 add interval=1d name=leds-off on-event=leds-off policy=write start-date=\
     2023-08-12 start-time=22:00:00

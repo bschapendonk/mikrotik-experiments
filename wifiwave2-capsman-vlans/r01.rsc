@@ -1,9 +1,10 @@
-# 2023-08-13 08:13:55 by RouterOS 7.11rc3
+# 2023-08-27 17:40:50 by RouterOS 7.11
 # software id = 96FN-KC2Y
 #
 # model = RB5009UG+S+
 /interface bridge
-add name=bridge vlan-filtering=yes
+add auto-mac=no name=bridge priority=0x4000 \
+    vlan-filtering=yes
 /interface ethernet
 set [ find default-name=ether1 ] name=ether1_ALL
 set [ find default-name=ether2 ] name=ether2_ALL
@@ -27,32 +28,25 @@ add bridge=bridge disabled=no name=HOME vlan-id=1020
 add bridge=bridge disabled=no name=OFFICE vlan-id=1010
 add bridge=bridge disabled=no name=IOT vlan-id=1030
 /interface wifiwave2 security
-add authentication-types=wpa2-psk,wpa3-psk disabled=no name=HOME passphrase=\
-    "" wps=disable
-add authentication-types=wpa2-psk,wpa3-psk disabled=no name=OFFICE \
-    passphrase="" \
-    wps=disable
-add authentication-types=wpa2-psk,wpa3-psk disabled=no name=IOT passphrase=\
-    "" wps=disable
+add authentication-types=wpa2-psk,wpa3-psk disabled=no ft=yes ft-over-ds=yes \
+    name=HOME wps=disable
+add authentication-types=wpa2-psk,wpa3-psk disabled=no ft=yes ft-over-ds=yes \
+    name=OFFICE wps=disable
+add authentication-types=wpa2-psk,wpa3-psk disabled=no ft=yes ft-over-ds=yes \
+    name=IOT wps=disable
 /interface wifiwave2 configuration
 add channel=5G country=Netherlands datapath=HOME disabled=no mode=ap name=\
-    HOME_5G security=HOME security.ft=yes .ft-over-ds=yes ssid=\
-    "Home"
+    HOME_5G security=HOME ssid="Home"
 add channel=2G country=Netherlands datapath=HOME disabled=no mode=ap name=\
-    HOME_2G security=HOME security.ft=yes .ft-over-ds=yes ssid=\
-    "Home"
+    HOME_2G security=HOME ssid="Home"
 add channel=5G country=Netherlands datapath=OFFICE disabled=no mode=ap name=\
-    OFFICE_5G security=OFFICE security.ft=yes .ft-over-ds=yes ssid=\
-    "Office"
+    OFFICE_5G security=OFFICE ssid="Office"
 add channel=2G country=Netherlands datapath=OFFICE disabled=no mode=ap name=\
-    OFFICE_2G security=OFFICE security.ft=yes .ft-over-ds=yes ssid=\
-    "Office"
-add channel=5G country=Netherlands datapath=IOT disabled=no mode=ap name=\
-    IOT_5G security=IOT security.ft=yes .ft-over-ds=yes ssid=\
-    "IoT"
+    OFFICE_2G security=OFFICE ssid="Office"
+add channel=5G country=Netherlands datapath=IOT disabled=yes mode=ap name=\
+    IOT_5G security=IOT ssid="IoT"
 add channel=2G country=Netherlands datapath=IOT disabled=no mode=ap name=\
-    IOT_2G security=IOT security.ft=yes .ft-over-ds=yes ssid=\
-    "IoT"
+    IOT_2G security=IOT ssid="IoT"
 /interface bridge port
 add bridge=bridge frame-types=admit-only-vlan-tagged interface=ether1_ALL
 add bridge=bridge frame-types=admit-only-vlan-tagged interface=ether2_ALL
@@ -88,9 +82,10 @@ set ca-certificate=auto certificate=auto enabled=yes interfaces=MGMT \
     suggest-same-version
 /interface wifiwave2 provisioning
 add action=create-dynamic-enabled disabled=no master-configuration=HOME_5G \
-    slave-configurations=OFFICE_5G supported-bands=5ghz-ax
+    name-format=%I-5g- slave-configurations=OFFICE_5G supported-bands=5ghz-ax
 add action=create-dynamic-enabled disabled=no master-configuration=HOME_2G \
-    slave-configurations=OFFICE_2G,IOT_2G supported-bands=2ghz-ax
+    name-format=%I-2g- slave-configurations=OFFICE_2G,IOT_2G supported-bands=\
+    2ghz-ax
 /ip cloud
 set update-time=no
 /ip dhcp-client
@@ -113,10 +108,6 @@ set name=r01
 set show-at-login=no
 /system ntp client
 set enabled=yes
-/system ntp client servers
-add address=10.185.0.1
-/system package update
-set channel=testing
 /tool mac-server
 set allowed-interface-list=Management
 /tool mac-server mac-winbox
